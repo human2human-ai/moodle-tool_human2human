@@ -31,7 +31,7 @@ namespace tool_human2human\local;
 class lti_adapter {
 
     /** @var string Where Dynamic Registration starts when the admin has not set another. */
-    const DEFAULT_REGISTRATION_URL = 'http://localhost:8000/lti/1.3/register/';
+    const DEFAULT_REGISTRATION_URL = 'https://lti.human2human.ai/lti/1.3/register/';
 
     /**
      * The URL the Connect action hands to Moodle's Dynamic Registration page.
