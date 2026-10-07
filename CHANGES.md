@@ -6,6 +6,11 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The admin page introduction matches the README, and the page shows that the
+  plugin is in alpha.
+
 ## [0.1.0]
 
 ### Added

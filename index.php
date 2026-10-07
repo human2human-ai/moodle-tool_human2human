@@ -31,5 +31,6 @@ admin_externalpage_setup('tool_human2human');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'tool_human2human'));
 echo html_writer::tag('p', get_string('intro', 'tool_human2human'));
+echo $OUTPUT->notification(get_string('alphanotice', 'tool_human2human'), \core\output\notification::NOTIFY_WARNING, false);
 echo $OUTPUT->notification(get_string('notconnected', 'tool_human2human'), \core\output\notification::NOTIFY_INFO, false);
 echo $OUTPUT->footer();

@@ -24,8 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['alphanotice'] = 'This plugin is in early development (alpha). It is not ready for production sites yet.';
 $string['human2human:configure'] = 'Connect the site to Human2Human and manage its tool';
-$string['intro'] = 'Human2Human adds guided conversation activities to your courses. Getting started is free: connecting the site and running activities on the free plan needs no payment.';
+$string['intro'] = 'Add AI-facilitated oral exams, role plays, debates and guided reflections to any Moodle course. Every learner gets a real conversation and rubric-based feedback the moment it ends, with scores in the gradebook and embedded cohort insights.';
 $string['notconnected'] = 'This site is not connected to Human2Human yet.';
 $string['pluginname'] = 'Human2Human';
 $string['privacy:metadata'] = 'The Human2Human plugin stores no personal data and sends none to Human2Human itself.';
