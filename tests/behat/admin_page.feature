@@ -10,8 +10,11 @@ Feature: Human2Human admin page
   # Only the WCAG checks: the best-practice extras flag core Boost's navigation
   # (landmark-unique) on Moodle 4.5 and 5.2.
   @javascript @accessibility
-  Scenario: An admin opens the Human2Human page
+  Scenario: An admin opens the Human2Human page and is offered the connect action
     Given I log in as "admin"
     When I navigate to "Plugins > Admin tools > Human2Human" in site administration
     Then I should see "This site is not connected to Human2Human yet."
+    And I should see "Connect Human2Human"
+    # Nothing to finish until a registration exists.
+    And I should not see "Finish setup"
     And the page should meet accessibility standards

@@ -31,4 +31,20 @@ if ($hassiteconfig) {
         new moodle_url('/admin/tool/human2human/index.php'),
         'tool/human2human:configure'
     ));
+
+    $settings = new admin_settingpage(
+        'tool_human2human_settings',
+        get_string('settings', 'tool_human2human'),
+        'tool/human2human:configure'
+    );
+    // Only reason this is editable: a development or staging Human2Human. The
+    // default is the hosted service, so a normal site never touches it.
+    $settings->add(new admin_setting_configtext(
+        'tool_human2human/registrationurl',
+        get_string('registrationurl', 'tool_human2human'),
+        get_string('registrationurl_desc', 'tool_human2human'),
+        \tool_human2human\local\lti_adapter::DEFAULT_REGISTRATION_URL,
+        PARAM_URL
+    ));
+    $ADMIN->add('tools', $settings);
 }
