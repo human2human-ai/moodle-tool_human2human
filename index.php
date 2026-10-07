@@ -56,6 +56,11 @@ if ($type === null) {
     // Nothing registered yet: offer the one button that starts the exchange.
     echo $OUTPUT->notification(get_string('notconnected', 'tool_human2human'), notification::NOTIFY_INFO, false);
     echo html_writer::tag('p', get_string('connectintro', 'tool_human2human'));
+    echo html_writer::tag('p', get_string(
+        'registrationtarget',
+        'tool_human2human',
+        s(lti_adapter::registration_url())
+    ));
 
     // Moodle core owns the whole protocol from here. It requires site:config of
     // its own, and it opens in a new tab because the administrator signs in to
@@ -64,9 +69,12 @@ if ($type === null) {
         'url' => lti_adapter::registration_url(),
         'sesskey' => sesskey(),
     ]);
+    // formtarget, not target: single_button puts these on the <button>, where
+    // `target` is not an attribute and the submit stays in the current tab. The
+    // new tab has to keep its opener — that is how the tool's
+    // org.imsglobal.lti.close message gets back here — so no `noopener`.
     echo $OUTPUT->single_button($connecturl, get_string('connect', 'tool_human2human'), 'get', [
-        'target' => '_blank',
-        'rel' => 'noopener',
+        'formtarget' => '_blank',
     ]);
 } else if (lti_adapter::needs_setup($type)) {
     // Registered, but Dynamic Registration leaves it pending and out of the

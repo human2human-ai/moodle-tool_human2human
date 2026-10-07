@@ -35,6 +35,7 @@ $string['human2human:configure'] = 'Connect the site to Human2Human and manage i
 $string['intro'] = 'Human2Human adds guided conversation activities to your courses. Getting started is free: connecting the site and running activities on the free plan needs no payment.';
 $string['managetools'] = 'Manage external tools';
 $string['notconnected'] = 'This site is not connected to Human2Human yet.';
+$string['registrationtarget'] = 'This connects to Human2Human at {$a}. A tool registered from any other address is not recognised here, so change this under Human2Human settings before connecting if that is not the right one.';
 $string['pluginname'] = 'Human2Human';
 $string['privacy:metadata'] = 'The Human2Human plugin stores no personal data and sends none to Human2Human itself.';
 $string['readyintro'] = 'Teachers add the activity to a course, then choose which Human2Human conversation it opens. Grades return to the gradebook.';
