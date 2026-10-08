@@ -28,7 +28,6 @@ namespace tool_human2human\local;
  * @covers      \tool_human2human\local\lti_adapter
  */
 final class lti_adapter_test extends \advanced_testcase {
-
     /** @var string A Human2Human that is not the hosted default. */
     const TOOL_URL = 'https://h2h.example.net/lti/1.3/register/';
 
@@ -50,7 +49,8 @@ final class lti_adapter_test extends \advanced_testcase {
             'lti_typename' => 'Human2Human',
             'lti_toolurl' => $launchurl,
             'lti_ltiversion' => LTI_VERSION_1P3,
-            'lti_clientid' => 'test-client-id',
+            // Client IDs are unique per site, and some tests register two tools.
+            'lti_clientid' => 'test-client-' . parse_url($launchurl, PHP_URL_HOST),
             'lti_coursevisible' => LTI_COURSEVISIBLE_PRECONFIGURED,
             'lti_forcessl' => 1,
         ];
@@ -120,20 +120,21 @@ final class lti_adapter_test extends \advanced_testcase {
         // Without this a teacher never sees the activity in the chooser, which is
         // the whole reason this action exists.
         $this->assertEquals(LTI_COURSEVISIBLE_ACTIVITYCHOOSER, $type->coursevisible);
-        $this->assertEquals(1, $type->contentitem);
         $this->assertFalse(lti_adapter::needs_setup());
         // The registration's identity must survive the update: a blank clientid
         // makes mod_lti mint a new one and every later launch fails.
-        $this->assertEquals('test-client-id', $type->clientid);
+        $this->assertEquals('test-client-h2h.example.net', $type->clientid);
         $this->assertEquals('h2h.example.net', $type->tooldomain);
 
         $config = lti_get_type_config($typeid);
+        // Deep Linking lives in the type config: lti_types has no column for it.
+        $this->assertEquals(1, $config['contentitem']);
         $this->assertEquals(LTI_LAUNCH_CONTAINER_WINDOW, $config['launchcontainer']);
         $this->assertEquals(LTI_SETTING_ALWAYS, $config['sendname']);
         $this->assertEquals(LTI_SETTING_NEVER, $config['sendemailaddr']);
         $this->assertEquals(2, $config['ltiservice_gradesynchronization']);
         $this->assertEquals(0, $config['ltiservice_memberships']);
-        // lti_prepare_type_for_save() rewrites forcessl with no isset() guard, so
+        // The function lti_prepare_type_for_save() rewrites forcessl with no isset() guard, so
         // a partial update would quietly clear it.
         $this->assertEquals(1, $config['forcessl']);
 

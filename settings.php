@@ -39,7 +39,7 @@ if ($hassiteconfig) {
     );
     // Only reason this is editable: a development or staging Human2Human. The
     // default is the hosted service, so a normal site never touches it.
-    $settings->add(new admin_setting_configtext(
+    $settings->add(new \tool_human2human\admin\setting_registrationurl(
         'tool_human2human/registrationurl',
         get_string('registrationurl', 'tool_human2human'),
         get_string('registrationurl_desc', 'tool_human2human'),

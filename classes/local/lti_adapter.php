@@ -29,7 +29,6 @@ namespace tool_human2human\local;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lti_adapter {
-
     /** @var string Where Dynamic Registration starts when the admin has not set another. */
     const DEFAULT_REGISTRATION_URL = 'https://lti.human2human.ai/lti/1.3/register/';
 
@@ -138,7 +137,7 @@ class lti_adapter {
             'ltiservice_gradesynchronization' => 2,
             'ltiservice_memberships' => 0,
             'ltiservice_toolsettings' => 0,
-            // lti_prepare_type_for_save() rewrites forcessl from whatever config
+            // The function lti_prepare_type_for_save() rewrites forcessl from whatever config
             // it is handed, with no isset() guard, so a partial update silently
             // clears it. Carry the stored value through.
             'lti_forcessl' => $existing['forcessl'] ?? 0,

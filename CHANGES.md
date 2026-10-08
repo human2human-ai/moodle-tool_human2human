@@ -6,6 +6,11 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The Registration URL setting ignores whitespace around a pasted address and
+  explains what a valid one looks like, instead of "This value is not valid".
+
 ## [0.2.0]
 
 ### Added
