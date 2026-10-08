@@ -21,6 +21,13 @@ All notable changes to this plugin are documented here. The format follows
 - The Human2Human page names the registration address only when it is not the
   hosted service.
 
+### Added
+
+- A Human2Human page under Plugins > Activity modules: which Human2Human team
+  the site is connected to (or, for a tool registered without one, the tool and
+  its address), whether it is ready for teachers, and every course activity
+  that launches Human2Human, with a link back to the connection page.
+
 ### Removed
 
 - The hidden Human2Human settings page and its link from the Human2Human page.

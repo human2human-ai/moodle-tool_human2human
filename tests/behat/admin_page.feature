@@ -36,3 +36,14 @@ Feature: Human2Human admin page
     And I set the field "Registration URL" to ""
     And I press "Save changes"
     And I should not see "other than the hosted service"
+
+  @javascript @accessibility
+  Scenario: An admin finds Human2Human among the activity modules
+    Given I log in as "admin"
+    When I navigate to "Plugins > Activity modules > Human2Human" in site administration
+    Then I should see "Human2Human activities"
+    And I should see "This site is not connected to Human2Human yet."
+    And I should see "No course uses Human2Human yet."
+    And the page should meet accessibility standards
+    And I click on "Connect Human2Human" "link"
+    And "Connect Human2Human" "button" should exist

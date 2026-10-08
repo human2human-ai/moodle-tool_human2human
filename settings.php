@@ -31,6 +31,15 @@ if ($hassiteconfig) {
         new moodle_url('/admin/tool/human2human/index.php')
     ));
 
+    // Also under Activity modules: what the site gets is an activity, even though
+    // it launches through the External tool activity, and an admin browsing the
+    // activity modules should find it there.
+    $ADMIN->add('modsettings', new admin_externalpage(
+        'tool_human2human_activities',
+        get_string('pluginname', 'tool_human2human'),
+        new moodle_url('/admin/tool/human2human/activities.php')
+    ));
+
     // No admin settings on purpose. Any registered here would put every
     // install and upgrade through the "New settings" page. The one value that
     // can change, the registration URL, is under Advanced on the page above

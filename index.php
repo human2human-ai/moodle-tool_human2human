@@ -152,6 +152,10 @@ $context = [
     'advanced' => $advanced,
     'links' => [
         [
+            'url' => (new moodle_url('/admin/tool/human2human/activities.php'))->out(false),
+            'label' => get_string('activities', 'tool_human2human'),
+        ],
+        [
             'url' => (new moodle_url('/mod/lti/toolconfigure.php'))->out(false),
             'label' => get_string('managetools', 'tool_human2human'),
         ],

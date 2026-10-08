@@ -1,0 +1,112 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template tool_human2human/activities
+
+    The Human2Human activities page: what the site is connected to, and the
+    course activities that launch Human2Human.
+
+    Context variables required for this template:
+    * connection - The connection, or null when there is none: team (or null),
+      toolname (only without a team), address, status.
+    * notconnected - Whether no Human2Human tool is registered.
+    * connecturl - The Human2Human connection page.
+    * activities - Each with name, url, coursename, courseurl, added.
+    * total - How many activities there are in all.
+    * pagingbar - Rendered paging bar.
+
+    Example context (json):
+    {
+        "connection": {
+            "team": "North High School",
+            "toolname": null,
+            "address": "https://lti.human2human.ai/lti/1.3/launch/",
+            "status": "Ready for teachers"
+        },
+        "notconnected": false,
+        "connecturl": "https://example.com/admin/tool/human2human/index.php",
+        "activities": [
+            {
+                "name": "Debate practice",
+                "url": "https://example.com/mod/lti/view.php?id=4",
+                "coursename": "Civics 101",
+                "courseurl": "https://example.com/course/view.php?id=2",
+                "added": "8 October 2026"
+            }
+        ],
+        "total": 1,
+        "pagingbar": ""
+    }
+}}
+<div class="tool_human2human">
+    <section class="card mb-4" aria-labelledby="tool_human2human-connection">
+        <div class="card-body">
+            <h3 id="tool_human2human-connection" class="h5 card-title">{{#str}} setupheading, tool_human2human {{/str}}</h3>
+            {{#notconnected}}
+            <p>{{#str}} notconnected, tool_human2human {{/str}}</p>
+            <a class="btn btn-primary" href="{{connecturl}}">{{#str}} connect, tool_human2human {{/str}}</a>
+            {{/notconnected}}
+            {{#connection}}
+            <dl class="tool_human2human-connection row mb-2">
+                {{#team}}
+                <dt class="col-sm-3">{{#str}} connectionteam, tool_human2human {{/str}}</dt>
+                <dd class="col-sm-9">{{team}}</dd>
+                {{/team}}
+                {{#toolname}}
+                <dt class="col-sm-3">{{#str}} connectiontool, tool_human2human {{/str}}</dt>
+                <dd class="col-sm-9">{{toolname}}</dd>
+                {{/toolname}}
+                <dt class="col-sm-3">{{#str}} connectionaddress, tool_human2human {{/str}}</dt>
+                <dd class="col-sm-9 text-break">{{address}}</dd>
+                <dt class="col-sm-3">{{#str}} connectionstatus, tool_human2human {{/str}}</dt>
+                <dd class="col-sm-9">{{status}}</dd>
+            </dl>
+            <a href="{{connecturl}}">{{#str}} manageconnection, tool_human2human {{/str}}</a>
+            {{/connection}}
+        </div>
+    </section>
+    <section class="card mb-4" aria-labelledby="tool_human2human-activities">
+        <div class="card-body">
+            <h3 id="tool_human2human-activities" class="h5 card-title">{{#str}} activitiesheading, tool_human2human {{/str}}</h3>
+            {{#total}}
+            <p>{{#str}} activitiescount, tool_human2human, {{total}} {{/str}}</p>
+            <table class="table generaltable">
+                <thead>
+                    <tr>
+                        <th scope="col">{{#str}} activityname, tool_human2human {{/str}}</th>
+                        <th scope="col">{{#str}} activitycourse, tool_human2human {{/str}}</th>
+                        <th scope="col">{{#str}} activityadded, tool_human2human {{/str}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#activities}}
+                    <tr>
+                        <td><a href="{{url}}">{{name}}</a></td>
+                        <td><a href="{{courseurl}}">{{coursename}}</a></td>
+                        <td>{{added}}</td>
+                    </tr>
+                    {{/activities}}
+                </tbody>
+            </table>
+            {{{pagingbar}}}
+            {{/total}}
+            {{^total}}
+            <p class="mb-0">{{#str}} activitiesnone, tool_human2human {{/str}}</p>
+            {{/total}}
+        </div>
+    </section>
+</div>

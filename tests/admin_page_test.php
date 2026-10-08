@@ -38,10 +38,11 @@ final class admin_page_test extends \advanced_testcase {
      * Whether the current user may open the page, as admin_externalpage_setup() decides:
      * the page must be in the user's admin tree and pass its access check.
      *
+     * @param string $name The admin page's name.
      * @return bool
      */
-    private function can_open_page(): bool {
-        $page = admin_get_root(true, false)->locate('tool_human2human');
+    private function can_open_page(string $name = 'tool_human2human'): bool {
+        $page = admin_get_root(true, false)->locate($name);
         return $page instanceof \admin_externalpage && $page->check_access();
     }
 
@@ -52,6 +53,17 @@ final class admin_page_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->assertTrue($this->can_open_page());
+        $this->assertTrue($this->can_open_page('tool_human2human_activities'));
+    }
+
+    /**
+     * The activities page is listed under Activity modules, beside the real ones.
+     */
+    public function test_activities_page_is_under_activity_modules(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $modules = admin_get_root(true, false)->locate('modsettings');
+        $this->assertInstanceOf(\admin_externalpage::class, $modules->locate('tool_human2human_activities'));
     }
 
     /**
@@ -96,5 +108,6 @@ final class admin_page_test extends \advanced_testcase {
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
         $this->setUser($teacher);
         $this->assertFalse($this->can_open_page());
+        $this->assertFalse($this->can_open_page('tool_human2human_activities'));
     }
 }

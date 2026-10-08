@@ -24,15 +24,27 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activities'] = 'Human2Human activities';
+$string['activitiescount'] = 'Activities in courses that launch Human2Human: {$a}';
+$string['activitiesheading'] = 'Activities in courses';
+$string['activitiesnone'] = 'No course uses Human2Human yet. Once the site is connected, teachers add it from the activity chooser.';
+$string['activityadded'] = 'Added';
+$string['activitycourse'] = 'Course';
+$string['activityname'] = 'Activity';
 $string['advanced'] = 'Advanced: connect to a different Human2Human';
 $string['connect'] = 'Connect Human2Human';
 $string['connectedpending'] = 'Human2Human is registered but not active yet, so teachers cannot find it in the activity chooser.';
 $string['connectedready'] = 'Human2Human is connected and ready. Teachers can add "{$a}" from the activity chooser.';
 $string['connectintro'] = 'Connecting opens Human2Human in a new tab, where you sign in and choose the team the site belongs to. Nothing has to be copied between the two sites. You need a Human2Human account that owns a team.';
+$string['connectionaddress'] = 'Address';
+$string['connectionstatus'] = 'Status';
+$string['connectionteam'] = 'Team';
+$string['connectiontool'] = 'Tool';
 $string['finishsetup'] = 'Finish setup';
 $string['finishsetupintro'] = 'Review the privacy and service settings under Manage tools if you want to, then finish the setup. This activates the tool, adds it to the activity chooser, turns on activity selection and grade sync, and sends each participant\'s name but not their email address.';
 $string['intro'] = 'Human2Human adds guided conversation activities to your courses. This page connects the site to Human2Human and sets up the external tool that the activities launch through.';
 $string['ltidisabled'] = 'The External tool activity (mod_lti) is disabled on this site, and Human2Human activities launch through it. Enable it under Site administration > Plugins > Activity modules > Manage activities, then come back.';
+$string['manageconnection'] = 'Manage the connection';
 $string['managetools'] = 'Manage external tools';
 $string['notconnected'] = 'This site is not connected to Human2Human yet.';
 $string['pluginname'] = 'Human2Human';
@@ -47,6 +59,8 @@ $string['relatedlinks'] = 'Related pages';
 $string['setupdone'] = 'Human2Human is active and available in the activity chooser.';
 $string['setupheading'] = 'Connection';
 $string['setupnothing'] = 'There is nothing to set up yet. Connect Human2Human first.';
+$string['statuspending'] = 'Registered, but setup is not finished';
+$string['statusready'] = 'Ready for teachers';
 $string['stepconnect'] = 'Connect';
 $string['stepdone'] = 'done';
 $string['stepfinish'] = 'Finish setup';

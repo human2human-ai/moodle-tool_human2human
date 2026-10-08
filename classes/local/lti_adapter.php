@@ -37,6 +37,9 @@ class lti_adapter {
     /** @var string Where Dynamic Registration starts when the admin has not set another. */
     const DEFAULT_REGISTRATION_URL = 'https://lti.human2human.ai/lti/1.3/register/';
 
+    /** @var string The custom parameter Human2Human sends its team name in. */
+    const TEAM_CUSTOM_PARAMETER = 'human2human_team';
+
     /**
      * The URL the Connect action hands to Moodle's Dynamic Registration page.
      *
@@ -128,6 +131,74 @@ class lti_adapter {
         ], 'id DESC');
 
         return $types ? reset($types) : null;
+    }
+
+    /**
+     * The Human2Human team the tool was registered for, if it said.
+     *
+     * Human2Human sends it as a custom parameter of its registration document,
+     * which Moodle stores with the type. Tools registered before it did, or by
+     * hand, have none. A snapshot: a later rename on Human2Human does not show.
+     *
+     * @param \stdClass $type
+     * @return string|null
+     */
+    public static function team_name(\stdClass $type): ?string {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/lti/locallib.php');
+
+        $custom = lti_get_type_config($type->id)['customparameters'] ?? '';
+        foreach (preg_split('/[\r\n;]+/', $custom) as $line) {
+            [$name, $value] = array_pad(explode('=', $line, 2), 2, '');
+            if (trim($name) === self::TEAM_CUSTOM_PARAMETER && trim($value) !== '') {
+                return trim($value);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Course activities that launch Human2Human, a page at a time.
+     *
+     * Matched by tool domain rather than type id, so activities created under an
+     * earlier registration of the same Human2Human are listed too.
+     *
+     * @param int $from First record, for paging.
+     * @param int $limit Records per page.
+     * @return array [total, records with cmid, name, courseid, coursename, timecreated]
+     */
+    public static function linked_activities(int $from = 0, int $limit = 0): array {
+        global $CFG, $DB, $SITE;
+        require_once($CFG->dirroot . '/mod/lti/locallib.php');
+
+        $domain = self::tool_domain();
+        if ($domain === null) {
+            return [0, []];
+        }
+        $params = [
+            'domain' => $domain,
+            'ltiversion' => LTI_VERSION_1P3,
+            'site' => $SITE->id,
+            'modname' => 'lti',
+        ];
+        $fromwhere = "FROM {lti} l
+                       JOIN {lti_types} t ON t.id = l.typeid
+                       JOIN {course} c ON c.id = l.course
+                       JOIN {modules} m ON m.name = :modname
+                       JOIN {course_modules} cm ON cm.module = m.id AND cm.instance = l.id
+                      WHERE t.tooldomain = :domain AND t.ltiversion = :ltiversion AND t.course = :site
+                            AND cm.deletioninprogress = 0";
+
+        $total = $DB->count_records_sql("SELECT COUNT(1) $fromwhere", $params);
+        $records = $DB->get_records_sql(
+            "SELECT cm.id AS cmid, l.name, c.id AS courseid, c.fullname AS coursename, l.timecreated
+             $fromwhere
+             ORDER BY l.timecreated DESC, cm.id DESC",
+            $params,
+            $from,
+            $limit
+        );
+        return [$total, array_values($records)];
     }
 
     /**

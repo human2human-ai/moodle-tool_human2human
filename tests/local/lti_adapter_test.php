@@ -35,9 +35,10 @@ final class lti_adapter_test extends \advanced_testcase {
      * Create a site-level LTI 1.3 tool type the way Dynamic Registration leaves one.
      *
      * @param string $launchurl The tool's launch URL.
+     * @param string $customparameters As Moodle stores them: key=value lines.
      * @return int The new type's id.
      */
-    private function create_registered_type(string $launchurl): int {
+    private function create_registered_type(string $launchurl, string $customparameters = ''): int {
         global $CFG, $SITE;
         require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
@@ -53,6 +54,7 @@ final class lti_adapter_test extends \advanced_testcase {
             'lti_clientid' => 'test-client-' . parse_url($launchurl, PHP_URL_HOST),
             'lti_coursevisible' => LTI_COURSEVISIBLE_PRECONFIGURED,
             'lti_forcessl' => 1,
+            'lti_customparameters' => $customparameters,
         ];
 
         return lti_add_type($type, $config);
@@ -197,5 +199,56 @@ final class lti_adapter_test extends \advanced_testcase {
         $this->assertEquals($type->coursevisible, $again->coursevisible);
         $this->assertEquals($type->clientid, $again->clientid);
         $this->assertEquals($config, lti_get_type_config($typeid));
+    }
+
+    public function test_team_name_comes_from_the_registration_custom_parameter(): void {
+        $this->resetAfterTest();
+        set_config('registrationurl', self::TOOL_URL, 'tool_human2human');
+
+        $typeid = $this->create_registered_type(
+            'https://h2h.example.net/lti/1.3/launch/',
+            "other=1\nhuman2human_team=North High = School\n"
+        );
+        $this->assertSame('North High = School', lti_adapter::team_name($this->get_type($typeid)));
+    }
+
+    public function test_team_name_is_null_for_a_tool_registered_without_one(): void {
+        $this->resetAfterTest();
+        set_config('registrationurl', self::TOOL_URL, 'tool_human2human');
+
+        $typeid = $this->create_registered_type('https://h2h.example.net/lti/1.3/launch/');
+        $this->assertNull(lti_adapter::team_name($this->get_type($typeid)));
+    }
+
+    public function test_linked_activities_lists_every_registration_of_our_tool_and_nothing_else(): void {
+        global $DB;
+        $this->resetAfterTest();
+        set_config('registrationurl', self::TOOL_URL, 'tool_human2human');
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['fullname' => 'Civics 101']);
+
+        $this->assertSame([0, []], lti_adapter::linked_activities());
+
+        $earlier = $this->create_registered_type('https://h2h.example.net/lti/1.3/launch/');
+        // Client IDs are unique per site, and the next type has the same host.
+        $DB->set_field('lti_types', 'clientid', 'test-client-earlier', ['id' => $earlier]);
+        // A reconnect registers a new type; activities made under the old one still count.
+        $ours = $this->create_registered_type('https://h2h.example.net/lti/1.3/launch/?v=2');
+        $other = $this->create_registered_type('https://notus.example.org/lti/launch');
+        $generator->create_module('lti', ['course' => $course->id, 'typeid' => $earlier, 'name' => 'Debate practice']);
+        $generator->create_module('lti', ['course' => $course->id, 'typeid' => $ours, 'name' => 'Interview practice']);
+        $generator->create_module('lti', ['course' => $course->id, 'typeid' => $other, 'name' => 'Not ours']);
+
+        [$total, $records] = lti_adapter::linked_activities();
+        $this->assertSame(2, $total);
+        $names = array_column($records, 'name');
+        sort($names);
+        $this->assertSame(['Debate practice', 'Interview practice'], $names);
+        $this->assertSame('Civics 101', $records[0]->coursename);
+
+        // Paged: the total stays, the page shrinks.
+        [$total, $records] = lti_adapter::linked_activities(0, 1);
+        $this->assertSame(2, $total);
+        $this->assertCount(1, $records);
     }
 }
