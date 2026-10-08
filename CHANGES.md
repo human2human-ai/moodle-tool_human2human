@@ -8,6 +8,9 @@ All notable changes to this plugin are documented here. The format follows
 
 ### Changed
 
+- The Human2Human page shows the connection as three steps (Connect, Finish
+  setup, Ready for teachers) in a branded, width-limited layout rendered from a
+  Mustache template, with related pages beside it.
 - The Registration URL setting ignores whitespace around a pasted address and
   explains what a valid one looks like, instead of "This value is not valid".
 

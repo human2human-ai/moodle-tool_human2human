@@ -16,5 +16,5 @@ Feature: Human2Human admin page
     Then I should see "This site is not connected to Human2Human yet."
     And I should see "Connect Human2Human"
     # Nothing to finish until a registration exists.
-    And I should not see "Finish setup"
+    And "Finish setup" "button" should not exist
     And the page should meet accessibility standards

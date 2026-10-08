@@ -1,0 +1,82 @@
+/* Human2Human admin page (templates/index.mustache). Every rule is scoped to the
+   plugin's wrapper so nothing reaches the rest of the site; colours are the
+   Human2Human teals, at contrasts that pass WCAG AA on white. */
+
+.tool_human2human {
+    max-width: 72rem;
+}
+
+.tool_human2human-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: #f0fbfd;
+    border: 1px solid #d8e0e1;
+    border-left: 4px solid #00a393;
+    border-radius: .5rem;
+}
+
+.tool_human2human-logo {
+    height: auto;
+    margin: 0 1.5rem .5rem 0;
+}
+
+.tool_human2human-intro {
+    flex: 1 1 20rem;
+    max-width: 40rem;
+    font-size: 1.05rem;
+    color: #1a505b;
+}
+
+.tool_human2human .card-body > p {
+    max-width: 44rem;
+}
+
+.tool_human2human-steps {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    list-style: none;
+}
+
+.tool_human2human-step {
+    display: flex;
+    align-items: center;
+    margin: 0 1.5rem .5rem 0;
+    color: #5c6770;
+}
+
+.tool_human2human-step-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: .5rem;
+    font-size: .875rem;
+    font-weight: 600;
+    border: 2px solid #b9c9cc;
+    border-radius: 50%;
+}
+
+.tool_human2human-step.is-current {
+    font-weight: 600;
+    color: #1a505b;
+}
+
+.tool_human2human-step.is-current .tool_human2human-step-marker {
+    color: #00776b;
+    border-color: #00776b;
+}
+
+.tool_human2human-step.is-done {
+    color: #1a505b;
+}
+
+.tool_human2human-step.is-done .tool_human2human-step-marker {
+    color: #fff;
+    background: #00776b;
+    border-color: #00776b;
+}

@@ -45,22 +45,35 @@ if ($action === 'finishsetup') {
 }
 
 $type = lti_adapter::find_type();
-$managetoolsurl = new moodle_url('/mod/lti/toolconfigure.php');
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'tool_human2human'));
-echo html_writer::tag('p', get_string('intro', 'tool_human2human'));
-echo $OUTPUT->notification(get_string('alphanotice', 'tool_human2human'), notification::NOTIFY_WARNING, false);
-
+// Where the connection stands decides the steps, the notice, and the one action.
 if ($type === null) {
+    $stage = 1;
+} else if (lti_adapter::needs_setup($type)) {
+    $stage = 2;
+} else {
+    $stage = 3;
+}
+
+$steps = [];
+foreach (['stepconnect', 'stepfinish', 'stepready'] as $index => $key) {
+    $number = $index + 1;
+    $steps[] = [
+        'number' => $number,
+        'label' => get_string($key, 'tool_human2human'),
+        // The last step is a state, not a task: reaching it completes it.
+        'done' => $number < $stage || $stage === 3,
+        'current' => $number === $stage,
+    ];
+}
+
+$registrationtarget = null;
+$action = '';
+if ($stage === 1) {
     // Nothing registered yet: offer the one button that starts the exchange.
-    echo $OUTPUT->notification(get_string('notconnected', 'tool_human2human'), notification::NOTIFY_INFO, false);
-    echo html_writer::tag('p', get_string('connectintro', 'tool_human2human'));
-    echo html_writer::tag('p', get_string(
-        'registrationtarget',
-        'tool_human2human',
-        s(lti_adapter::registration_url())
-    ));
+    $statusnotice = $OUTPUT->notification(get_string('notconnected', 'tool_human2human'), notification::NOTIFY_INFO, false);
+    $body = [get_string('connectintro', 'tool_human2human')];
+    $registrationtarget = get_string('registrationtarget', 'tool_human2human', lti_adapter::registration_url());
 
     // Moodle core owns the whole protocol from here. It requires site:config of
     // its own, and it opens in a new tab because the administrator signs in to
@@ -69,30 +82,56 @@ if ($type === null) {
         'url' => lti_adapter::registration_url(),
         'sesskey' => sesskey(),
     ]);
-    // formtarget, not target: single_button puts these on the <button>, where
+    // Use formtarget, not target: single_button puts these on the <button>, where
     // `target` is not an attribute and the submit stays in the current tab. The
     // new tab has to keep its opener — that is how the tool's
     // org.imsglobal.lti.close message gets back here — so no `noopener`.
-    echo $OUTPUT->single_button($connecturl, get_string('connect', 'tool_human2human'), 'get', [
+    $action = $OUTPUT->single_button($connecturl, get_string('connect', 'tool_human2human'), 'get', [
         'formtarget' => '_blank',
+        'type' => 'primary',
     ]);
-} else if (lti_adapter::needs_setup($type)) {
+} else if ($stage === 2) {
     // Registered, but Dynamic Registration leaves it pending and out of the
     // activity chooser, so teachers cannot find it yet.
-    echo $OUTPUT->notification(get_string('connectedpending', 'tool_human2human'), notification::NOTIFY_WARNING, false);
-    echo html_writer::tag('p', get_string('finishsetupintro', 'tool_human2human'));
-    echo $OUTPUT->single_button(
+    $statusnotice = $OUTPUT->notification(get_string('connectedpending', 'tool_human2human'), notification::NOTIFY_WARNING, false);
+    $body = [get_string('finishsetupintro', 'tool_human2human')];
+    $action = $OUTPUT->single_button(
         new moodle_url($pageurl, ['action' => 'finishsetup', 'sesskey' => sesskey()]),
-        get_string('finishsetup', 'tool_human2human')
+        get_string('finishsetup', 'tool_human2human'),
+        'post',
+        ['type' => 'primary']
     );
 } else {
-    echo $OUTPUT->notification(
+    $statusnotice = $OUTPUT->notification(
         get_string('connectedready', 'tool_human2human', format_string($type->name)),
         notification::NOTIFY_SUCCESS,
         false
     );
-    echo html_writer::tag('p', get_string('readyintro', 'tool_human2human'));
+    $body = [get_string('readyintro', 'tool_human2human')];
 }
 
-echo html_writer::tag('p', html_writer::link($managetoolsurl, get_string('managetools', 'tool_human2human')));
+$context = [
+    'logourl' => $OUTPUT->image_url('logo', 'tool_human2human')->out(false),
+    'intro' => get_string('intro', 'tool_human2human'),
+    'alphanotice' => $OUTPUT->notification(get_string('alphanotice', 'tool_human2human'), notification::NOTIFY_WARNING, false),
+    'steps' => $steps,
+    'statusnotice' => $statusnotice,
+    'body' => $body,
+    'registrationtarget' => $registrationtarget,
+    'action' => $action,
+    'links' => [
+        [
+            'url' => (new moodle_url('/mod/lti/toolconfigure.php'))->out(false),
+            'label' => get_string('managetools', 'tool_human2human'),
+        ],
+        [
+            'url' => (new moodle_url('/admin/settings.php', ['section' => 'tool_human2human_settings']))->out(false),
+            'label' => get_string('settings', 'tool_human2human'),
+        ],
+    ],
+];
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('pluginname', 'tool_human2human'));
+echo $OUTPUT->render_from_template('tool_human2human/index', $context);
 echo $OUTPUT->footer();

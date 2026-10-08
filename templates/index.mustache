@@ -1,0 +1,94 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template tool_human2human/index
+
+    The Human2Human admin page: what the plugin is, where the connection stands,
+    and the one action that moves it forward.
+
+    Context variables required for this template:
+    * logourl - The Human2Human logo.
+    * intro - What Human2Human adds to the site.
+    * alphanotice - Rendered notification about the plugin's maturity.
+    * steps - The three setup steps, each with label, number, done and current.
+    * statusnotice - Rendered notification for the current state.
+    * body - Paragraphs explaining the current state and its next action.
+    * registrationtarget - Where Connect goes; only before a connection exists.
+    * action - Rendered button for the next action, if there is one.
+    * links - Related admin pages, each with url and label.
+
+    Example context (json):
+    {
+        "logourl": "https://example.com/logo.svg",
+        "intro": "Human2Human adds guided conversation activities to your courses.",
+        "alphanotice": "<div class=\"alert alert-warning\">Alpha.</div>",
+        "steps": [
+            {"number": 1, "label": "Connect", "done": false, "current": true},
+            {"number": 2, "label": "Finish setup", "done": false, "current": false},
+            {"number": 3, "label": "Ready", "done": false, "current": false}
+        ],
+        "statusnotice": "<div class=\"alert alert-info\">Not connected yet.</div>",
+        "body": ["Connecting opens Human2Human in a new tab."],
+        "registrationtarget": "This connects to Human2Human at https://lti.human2human.ai/lti/1.3/register/.",
+        "action": "<button class=\"btn btn-primary\">Connect Human2Human</button>",
+        "links": [{"url": "https://example.com/mod/lti/toolconfigure.php", "label": "Manage external tools"}]
+    }
+}}
+<div class="tool_human2human">
+    <div class="tool_human2human-hero mb-4">
+        <img class="tool_human2human-logo" src="{{logourl}}" alt="" width="180" height="54">
+        <p class="tool_human2human-intro mb-0">{{intro}}</p>
+    </div>
+    {{{alphanotice}}}
+    <div class="row">
+        <div class="col-lg-8">
+            <section class="card mb-4" aria-labelledby="tool_human2human-setup">
+                <div class="card-body">
+                    <h3 id="tool_human2human-setup" class="h5 card-title">{{#str}} setupheading, tool_human2human {{/str}}</h3>
+                    <ol class="tool_human2human-steps">
+                        {{#steps}}
+                        <li class="tool_human2human-step{{#done}} is-done{{/done}}{{#current}} is-current{{/current}}"{{#current}} aria-current="step"{{/current}}>
+                            <span class="tool_human2human-step-marker" aria-hidden="true">{{#done}}&#10003;{{/done}}{{^done}}{{number}}{{/done}}</span>
+                            <span class="tool_human2human-step-label">{{label}}{{#done}}<span class="sr-only visually-hidden"> ({{#str}} stepdone, tool_human2human {{/str}})</span>{{/done}}</span>
+                        </li>
+                        {{/steps}}
+                    </ol>
+                    {{{statusnotice}}}
+                    {{#body}}
+                    <p>{{.}}</p>
+                    {{/body}}
+                    {{#registrationtarget}}
+                    <p class="small text-muted">{{registrationtarget}}</p>
+                    {{/registrationtarget}}
+                    {{{action}}}
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-4">
+            <aside class="card mb-4" aria-labelledby="tool_human2human-links">
+                <div class="card-body">
+                    <h3 id="tool_human2human-links" class="h6 card-title">{{#str}} relatedlinks, tool_human2human {{/str}}</h3>
+                    <ul class="list-unstyled mb-0">
+                        {{#links}}
+                        <li class="mb-2"><a href="{{url}}">{{label}}</a></li>
+                        {{/links}}
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
