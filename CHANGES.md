@@ -6,6 +6,11 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The page says "pair" rather than "connect" (**Pair with Human2Human**), since
+  CONNECT is the name of a Human2Human activity type.
+
 ## [0.2.0] - 2026-10-09
 
 ### Added

@@ -85,7 +85,7 @@ AI facilitator can converse in additional languages.
 
 - Moodle 4.5 to 5.3.
 - The External tool activity (`mod_lti`), which is part of standard Moodle.
-- A [Human2Human](https://human2human.ai) account. The free plan is enough to connect and use the
+- A [Human2Human](https://human2human.ai) account. The free plan is enough to pair and use the
   plugin.
 
 ## Getting started
@@ -96,8 +96,8 @@ AI facilitator can converse in additional languages.
    Install plugins**, upload the ZIP and follow the prompts. No shell access and
    no Composer step are needed. Alternatively, unzip it into
    `admin/tool/human2human` and visit **Site administration > Notifications**.
-3. Connect the site. Go to **Site administration > Plugins > Admin tools >
-   Human2Human** and select **Connect Human2Human**. A new tab opens on
+3. Pair the site. Go to **Site administration > Plugins > Admin tools >
+   Human2Human** and select **Pair with Human2Human**. A new tab opens on
    Human2Human, where you sign in and choose the team the site belongs to.
    Nothing is copied between the two sites, and no keys or IDs are entered by
    hand. The tab closes itself when it is done.
@@ -106,7 +106,7 @@ AI facilitator can converse in additional languages.
    dynamically registered tool does not do on its own. It also turns on activity
    selection and grade sync, launches activities in a new window, and sends each
    participant's name but not their email address. The page then confirms that
-   Human2Human is connected and ready.
+   Human2Human is paired and ready.
 5. Design an activity in [Human2Human](https://human2human.ai), or start from a template.
 6. In your course, turn editing on, add a Human2Human activity and select the
    activity you designed.
