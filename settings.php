@@ -28,14 +28,18 @@ if ($hassiteconfig) {
     $ADMIN->add('tools', new admin_externalpage(
         'tool_human2human',
         get_string('pluginname', 'tool_human2human'),
-        new moodle_url('/admin/tool/human2human/index.php'),
-        'tool/human2human:configure'
+        new moodle_url('/admin/tool/human2human/index.php')
     ));
 
+    // Hidden, so Admin tools gets one Human2Human entry rather than two. The
+    // hosted default is right for every real site; a development or staging
+    // Human2Human is set with admin/cli/cfg.php, which needs the setting
+    // registered here, and the Human2Human page links to this page.
     $settings = new admin_settingpage(
         'tool_human2human_settings',
         get_string('settings', 'tool_human2human'),
-        'tool/human2human:configure'
+        'moodle/site:config',
+        true
     );
     // Only reason this is editable: a development or staging Human2Human. The
     // default is the hosted service, so a normal site never touches it.

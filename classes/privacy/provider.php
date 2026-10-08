@@ -19,9 +19,13 @@ namespace tool_human2human\privacy;
 /**
  * Privacy provider.
  *
- * Launches, grades and rosters go through mod_lti, whose own provider declares
- * what it sends. Once this plugin talks to Human2Human directly (registration,
- * health checks), declare that here with a metadata provider instead.
+ * This plugin only configures a mod_lti tool type. Launches, grades and
+ * rosters are sent by mod_lti, and mod_lti's own privacy provider declares
+ * them; nothing reaches Human2Human through this plugin. A metadata provider
+ * here would have to be paired with no-op request providers to stay compliant
+ * (core_privacy\manager::component_is_compliant()), declaring a transfer this
+ * plugin never performs. So: null_provider, until this plugin talks to
+ * Human2Human itself (registration, health checks).
  *
  * @package     tool_human2human
  * @copyright   2026 eduNEXT {@link https://www.edunext.co}

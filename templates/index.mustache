@@ -23,7 +23,6 @@
     Context variables required for this template:
     * logourl - The Human2Human logo.
     * intro - What Human2Human adds to the site.
-    * alphanotice - Rendered notification about the plugin's maturity.
     * steps - The three setup steps, each with label, number, done and current.
     * statusnotice - Rendered notification for the current state.
     * body - Paragraphs explaining the current state and its next action.
@@ -35,7 +34,6 @@
     {
         "logourl": "https://example.com/logo.svg",
         "intro": "Human2Human adds guided conversation activities to your courses.",
-        "alphanotice": "<div class=\"alert alert-warning\">Alpha.</div>",
         "steps": [
             {"number": 1, "label": "Connect", "done": false, "current": true},
             {"number": 2, "label": "Finish setup", "done": false, "current": false},
@@ -53,7 +51,6 @@
         <img class="tool_human2human-logo" src="{{logourl}}" alt="" width="180" height="54">
         <p class="tool_human2human-intro mb-0">{{intro}}</p>
     </div>
-    {{{alphanotice}}}
     <div class="row">
         <div class="col-lg-8">
             <section class="card mb-4" aria-labelledby="tool_human2human-setup">

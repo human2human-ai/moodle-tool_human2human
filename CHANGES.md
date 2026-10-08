@@ -30,8 +30,23 @@ All notable changes to this plugin are documented here. The format follows
 
 ### Changed
 
-- The admin page introduction matches the README, and the page shows that the
-  plugin is in alpha.
+- The plugin is beta rather than alpha, and the admin page no longer carries an
+  alpha warning.
+- The Human2Human page and its settings require "Configure site"
+  (`moodle/site:config`). The `tool/human2human:configure` capability is gone:
+  only holders of `moodle/site:config` could ever reach the page, and core's
+  Dynamic Registration requires it too, so the Connect action dead-ended for
+  anyone else.
+- The Registration URL page is hidden, leaving one Human2Human entry under Admin
+  tools. It is still reachable from the Human2Human page and settable with
+  `admin/cli/cfg.php`.
+- The admin page introduction describes what the page does instead of repeating
+  the pricing, and the README documents installing and connecting.
+
+### Fixed
+
+- The Human2Human page reports it when the External tool activity (`mod_lti`) is
+  disabled, rather than offering actions that cannot work.
 
 ## [0.1.0]
 

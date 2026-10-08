@@ -19,8 +19,13 @@ namespace tool_human2human\local;
 /**
  * The only code in this plugin that touches mod_lti internals.
  *
- * Everything here goes through mod_lti's own functions rather than its tables,
- * but those functions are internal to that module and do change between
+ * Writes go through mod_lti's own functions. The one direct table read is
+ * find_type(), because mod_lti exposes no lookup that answers "the site-level
+ * 1.3 type for this domain": lti_get_tools_by_domain() joins
+ * lti_types_categories and so hides a category-restricted type, and
+ * lti_filter_get_types() returns neither tooldomain nor ltiversion.
+ *
+ * Either way these are another module's internals and do change between
  * releases. Keeping them in one class means one place to fix and one class to
  * cover with tests on every supported branch.
  *

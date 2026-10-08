@@ -32,7 +32,7 @@ $action = optional_param('action', '', PARAM_ALPHA);
 
 // Checks login, the page's capability and sets up the admin navigation.
 admin_externalpage_setup('tool_human2human');
-require_capability('tool/human2human:configure', context_system::instance());
+require_capability('moodle/site:config', context_system::instance());
 
 $pageurl = new moodle_url('/admin/tool/human2human/index.php');
 
@@ -45,6 +45,10 @@ if ($action === 'finishsetup') {
 }
 
 $type = lti_adapter::find_type();
+
+// The $plugin->dependencies entry catches mod_lti being uninstalled, not an
+// admin disabling it under Manage activities, which breaks everything below.
+$ltienabled = array_key_exists('lti', \core\plugininfo\mod::get_enabled_plugins());
 
 // Where the connection stands decides the steps, the notice, and the one action.
 if ($type === null) {
@@ -110,10 +114,18 @@ if ($stage === 1) {
     $body = [get_string('readyintro', 'tool_human2human')];
 }
 
+if (!$ltienabled) {
+    // Nothing on this page can work without mod_lti, so say so and offer nothing.
+    $statusnotice = $OUTPUT->notification(get_string('ltidisabled', 'tool_human2human'), notification::NOTIFY_ERROR, false);
+    $steps = [];
+    $body = [];
+    $registrationtarget = null;
+    $action = '';
+}
+
 $context = [
     'logourl' => $OUTPUT->image_url('logo', 'tool_human2human')->out(false),
     'intro' => get_string('intro', 'tool_human2human'),
-    'alphanotice' => $OUTPUT->notification(get_string('alphanotice', 'tool_human2human'), notification::NOTIFY_WARNING, false),
     'steps' => $steps,
     'statusnotice' => $statusnotice,
     'body' => $body,
