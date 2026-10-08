@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['advanced'] = 'Advanced: connect to a different Human2Human';
 $string['connect'] = 'Connect Human2Human';
 $string['connectedpending'] = 'Human2Human is registered but not active yet, so teachers cannot find it in the activity chooser.';
 $string['connectedready'] = 'Human2Human is connected and ready. Teachers can add "{$a}" from the activity chooser.';
@@ -37,12 +38,12 @@ $string['notconnected'] = 'This site is not connected to Human2Human yet.';
 $string['pluginname'] = 'Human2Human';
 $string['privacy:metadata'] = 'The Human2Human plugin stores no personal data and sends none itself. It configures an external tool, and everything a Human2Human activity sends or receives is sent by the External tool activity (mod_lti), which declares it in its own privacy metadata.';
 $string['readyintro'] = 'Teachers add the activity to a course, then choose which Human2Human conversation it opens. Grades return to the gradebook.';
-$string['registrationtarget'] = 'This connects to Human2Human at {$a}. A tool registered from any other address is not recognised here, so change this under Human2Human settings before connecting if that is not the right one.';
+$string['registrationtarget'] = 'This connects to a Human2Human other than the hosted service, at {$a}. Change it under Advanced if that is not intended.';
 $string['registrationurl'] = 'Registration URL';
-$string['registrationurl_desc'] = 'Where registration starts. Leave this alone unless you are connecting to a development or staging Human2Human.';
+$string['registrationurl_desc'] = 'Only for a development, staging or private Human2Human. Leave empty to use the hosted service at {$a}. Connect recognises the tool it registers by this address, so set it before connecting.';
 $string['registrationurl_invalid'] = 'Enter a full http:// or https:// address, such as https://lti.human2human.ai/lti/1.3/register/.';
+$string['registrationurlsaved'] = 'Connect will use the new address.';
 $string['relatedlinks'] = 'Related pages';
-$string['settings'] = 'Human2Human settings';
 $string['setupdone'] = 'Human2Human is active and available in the activity chooser.';
 $string['setupheading'] = 'Connection';
 $string['setupnothing'] = 'There is nothing to set up yet. Connect Human2Human first.';

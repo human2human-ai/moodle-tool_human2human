@@ -73,11 +73,29 @@ foreach (['stepconnect', 'stepfinish', 'stepready'] as $index => $key) {
 
 $registrationtarget = null;
 $action = '';
+$advanced = '';
+if ($stage === 1 && $ltienabled) {
+    // Which Human2Human to connect to, collapsed: only developers, staging sites
+    // and private installations change it. Offered only before connecting,
+    // because find_type() recognises the tool by this URL's host, so changing it
+    // afterwards would orphan the registered tool.
+    $form = new \tool_human2human\form\registrationurl_form($pageurl);
+    if ($data = $form->get_data()) {
+        $url = (string) $data->registrationurl;
+        lti_adapter::set_registration_url($url === '' ? '' : lti_adapter::clean_registration_url($url));
+        redirect($pageurl, get_string('registrationurlsaved', 'tool_human2human'), null, notification::NOTIFY_SUCCESS);
+    }
+    $advanced = $form->render();
+}
+
 if ($stage === 1) {
     // Nothing registered yet: offer the one button that starts the exchange.
     $statusnotice = $OUTPUT->notification(get_string('notconnected', 'tool_human2human'), notification::NOTIFY_INFO, false);
     $body = [get_string('connectintro', 'tool_human2human')];
-    $registrationtarget = get_string('registrationtarget', 'tool_human2human', lti_adapter::registration_url());
+    if (lti_adapter::is_registration_url_overridden()) {
+        // Silent for the hosted service; worth a line when it is anything else.
+        $registrationtarget = get_string('registrationtarget', 'tool_human2human', lti_adapter::registration_url());
+    }
 
     // Moodle core owns the whole protocol from here. It requires site:config of
     // its own, and it opens in a new tab because the administrator signs in to
@@ -131,14 +149,11 @@ $context = [
     'body' => $body,
     'registrationtarget' => $registrationtarget,
     'action' => $action,
+    'advanced' => $advanced,
     'links' => [
         [
             'url' => (new moodle_url('/mod/lti/toolconfigure.php'))->out(false),
             'label' => get_string('managetools', 'tool_human2human'),
-        ],
-        [
-            'url' => (new moodle_url('/admin/settings.php', ['section' => 'tool_human2human_settings']))->out(false),
-            'label' => get_string('settings', 'tool_human2human'),
         ],
     ],
 ];

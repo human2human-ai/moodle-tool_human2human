@@ -55,6 +55,39 @@ final class admin_page_test extends \advanced_testcase {
     }
 
     /**
+     * Installing or upgrading asks the admin nothing: any admin setting the
+     * plugin registered would appear on core's "New settings" page.
+     */
+    public function test_registers_no_admin_settings(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->assertSame([], $this->plugin_settings(admin_get_root(true, false)));
+    }
+
+    /**
+     * Names of the tool_human2human settings anywhere under an admin tree node.
+     *
+     * @param \part_of_admin_tree $node
+     * @return string[]
+     */
+    private function plugin_settings(\part_of_admin_tree $node): array {
+        $found = [];
+        if ($node instanceof \admin_settingpage) {
+            foreach ($node->settings as $setting) {
+                if ($setting->plugin === 'tool_human2human') {
+                    $found[] = $setting->name;
+                }
+            }
+        }
+        if ($node instanceof \admin_category) {
+            foreach ($node->children as $child) {
+                $found = array_merge($found, $this->plugin_settings($child));
+            }
+        }
+        return $found;
+    }
+
+    /**
      * A teacher cannot open the page.
      */
     public function test_teacher_cannot_open(): void {

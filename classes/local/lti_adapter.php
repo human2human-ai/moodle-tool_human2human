@@ -48,6 +48,50 @@ class lti_adapter {
     }
 
     /**
+     * Point Connect at another Human2Human, or back at the hosted one.
+     *
+     * Only an override is stored. The hosted URL, or an empty value, clears it,
+     * so the site follows DEFAULT_REGISTRATION_URL rather than a copy of it.
+     *
+     * @param string $url A URL clean_registration_url() accepted, or ''.
+     */
+    public static function set_registration_url(string $url): void {
+        if ($url === '' || $url === self::DEFAULT_REGISTRATION_URL) {
+            unset_config('registrationurl', 'tool_human2human');
+            return;
+        }
+        set_config('registrationurl', $url, 'tool_human2human');
+    }
+
+    /**
+     * Whether Connect goes somewhere other than the hosted Human2Human.
+     *
+     * @return bool
+     */
+    public static function is_registration_url_overridden(): bool {
+        return self::registration_url() !== self::DEFAULT_REGISTRATION_URL;
+    }
+
+    /**
+     * A typed or pasted registration URL, cleaned, or null when it is not one.
+     *
+     * Surrounding whitespace is dropped, since a copied URL often carries some.
+     * Anything but an http(s) URL that PARAM_URL leaves unchanged is refused:
+     * Moodle's Dynamic Registration page could not open it.
+     *
+     * @param string $value
+     * @return string|null
+     */
+    public static function clean_registration_url(string $value): ?string {
+        $value = trim($value);
+        $scheme = strtolower((string) parse_url($value, PHP_URL_SCHEME));
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return null;
+        }
+        return clean_param($value, PARAM_URL) === $value ? $value : null;
+    }
+
+    /**
      * The host the registered tool launches from, used to recognise its tool type.
      *
      * @return string|null Null when the configured URL has no usable host.

@@ -79,6 +79,58 @@ final class lti_adapter_test extends \advanced_testcase {
         $this->assertSame('h2h.example.net', lti_adapter::tool_domain());
     }
 
+    public function test_set_registration_url_stores_only_an_override(): void {
+        $this->resetAfterTest();
+
+        lti_adapter::set_registration_url(self::TOOL_URL);
+        $this->assertSame(self::TOOL_URL, get_config('tool_human2human', 'registrationurl'));
+        $this->assertTrue(lti_adapter::is_registration_url_overridden());
+
+        // Back to the hosted service by name: nothing stored, so a later default follows.
+        lti_adapter::set_registration_url(lti_adapter::DEFAULT_REGISTRATION_URL);
+        $this->assertFalse(get_config('tool_human2human', 'registrationurl'));
+        $this->assertFalse(lti_adapter::is_registration_url_overridden());
+
+        // And by leaving it empty.
+        lti_adapter::set_registration_url(self::TOOL_URL);
+        lti_adapter::set_registration_url('');
+        $this->assertFalse(get_config('tool_human2human', 'registrationurl'));
+    }
+
+    public function test_clean_registration_url_trims_pasted_whitespace(): void {
+        $this->assertSame(
+            'https://h2h.example.net/lti/1.3/register/',
+            lti_adapter::clean_registration_url("  https://h2h.example.net/lti/1.3/register/ \n")
+        );
+        $this->assertSame(
+            'http://lti.localhost:5173/lti/1.3/register/',
+            lti_adapter::clean_registration_url('http://lti.localhost:5173/lti/1.3/register/')
+        );
+    }
+
+    /**
+     * Anything Moodle's Dynamic Registration page could not open is refused.
+     *
+     * @dataProvider refused_registration_url_provider
+     * @param string $value
+     */
+    public function test_clean_registration_url_refuses_what_is_not_a_web_url(string $value): void {
+        $this->assertNull(lti_adapter::clean_registration_url($value));
+    }
+
+    /**
+     * Values clean_registration_url() must refuse.
+     *
+     * @return array
+     */
+    public static function refused_registration_url_provider(): array {
+        return [
+            'script' => ['javascript:alert(1)'],
+            'no scheme' => ['lti.human2human.ai/lti/1.3/register/'],
+            'not a url' => ['not a url'],
+        ];
+    }
+
     public function test_find_type_matches_our_domain_and_leaves_other_tools_alone(): void {
         global $CFG;
         require_once($CFG->dirroot . '/mod/lti/locallib.php');

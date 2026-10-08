@@ -26,8 +26,11 @@
     * steps - The three setup steps, each with label, number, done and current.
     * statusnotice - Rendered notification for the current state.
     * body - Paragraphs explaining the current state and its next action.
-    * registrationtarget - Where Connect goes; only before a connection exists.
+    * registrationtarget - Where Connect goes; only before a connection exists,
+      and only when it is not the hosted Human2Human.
     * action - Rendered button for the next action, if there is one.
+    * advanced - Rendered, collapsed form for connecting to another Human2Human;
+      only before a connection exists.
     * links - Related admin pages, each with url and label.
 
     Example context (json):
@@ -41,8 +44,9 @@
         ],
         "statusnotice": "<div class=\"alert alert-info\">Not connected yet.</div>",
         "body": ["Connecting opens Human2Human in a new tab."],
-        "registrationtarget": "This connects to Human2Human at https://lti.human2human.ai/lti/1.3/register/.",
+        "registrationtarget": "This connects to a Human2Human other than the hosted service, at https://h2h.example.net/lti/1.3/register/.",
         "action": "<button class=\"btn btn-primary\">Connect Human2Human</button>",
+        "advanced": "<form><fieldset class=\"collapsed\"><legend>Advanced</legend></fieldset></form>",
         "links": [{"url": "https://example.com/mod/lti/toolconfigure.php", "label": "Manage external tools"}]
     }
 }}
@@ -72,6 +76,11 @@
                     <p class="small text-muted">{{registrationtarget}}</p>
                     {{/registrationtarget}}
                     {{{action}}}
+                    {{#advanced}}
+                    <div class="tool_human2human-advanced mt-4">
+                        {{{advanced}}}
+                    </div>
+                    {{/advanced}}
                 </div>
             </section>
         </div>

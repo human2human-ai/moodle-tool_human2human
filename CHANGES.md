@@ -11,8 +11,19 @@ All notable changes to this plugin are documented here. The format follows
 - The Human2Human page shows the connection as three steps (Connect, Finish
   setup, Ready for teachers) in a branded, width-limited layout rendered from a
   Mustache template, with related pages beside it.
-- The Registration URL setting ignores whitespace around a pasted address and
-  explains what a valid one looks like, instead of "This value is not valid".
+- Installing or upgrading the plugin no longer stops on a "New settings" page to
+  review the Registration URL. It is no longer an admin setting: Connect uses
+  the hosted Human2Human unless an address is set under the collapsed
+  "Advanced: connect to a different Human2Human" section of the Human2Human
+  page, offered before connecting. Only an override is stored, and clearing it
+  returns to the hosted service. `admin/cli/cfg.php` still sets it. The address
+  ignores surrounding whitespace and explains what a valid one looks like.
+- The Human2Human page names the registration address only when it is not the
+  hosted service.
+
+### Removed
+
+- The hidden Human2Human settings page and its link from the Human2Human page.
 
 ## [0.2.0]
 

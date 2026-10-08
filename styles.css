@@ -80,3 +80,11 @@
     background: #00776b;
     border-color: #00776b;
 }
+
+/* Advanced is for developers and private installations: a quiet, collapsed
+   section below the main action, not a heading that competes with it. */
+.tool_human2human-advanced .ftoggler h3 {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #495057;
+}

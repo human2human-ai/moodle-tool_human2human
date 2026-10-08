@@ -31,24 +31,8 @@ if ($hassiteconfig) {
         new moodle_url('/admin/tool/human2human/index.php')
     ));
 
-    // Hidden, so Admin tools gets one Human2Human entry rather than two. The
-    // hosted default is right for every real site; a development or staging
-    // Human2Human is set with admin/cli/cfg.php, which needs the setting
-    // registered here, and the Human2Human page links to this page.
-    $settings = new admin_settingpage(
-        'tool_human2human_settings',
-        get_string('settings', 'tool_human2human'),
-        'moodle/site:config',
-        true
-    );
-    // Only reason this is editable: a development or staging Human2Human. The
-    // default is the hosted service, so a normal site never touches it.
-    $settings->add(new \tool_human2human\admin\setting_registrationurl(
-        'tool_human2human/registrationurl',
-        get_string('registrationurl', 'tool_human2human'),
-        get_string('registrationurl_desc', 'tool_human2human'),
-        \tool_human2human\local\lti_adapter::DEFAULT_REGISTRATION_URL,
-        PARAM_URL
-    ));
-    $ADMIN->add('tools', $settings);
+    // No admin settings on purpose. Any registered here would put every
+    // install and upgrade through the "New settings" page. The one value that
+    // can change, the registration URL, is under Advanced on the page above
+    // (classes/form/registrationurl_form.php) and settable with admin/cli/cfg.php.
 }
