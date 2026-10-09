@@ -15,8 +15,9 @@ Feature: Human2Human admin page
     When I navigate to "Plugins > Admin tools > Human2Human" in site administration
     Then I should see "This site is not paired with Human2Human yet."
     And I should see "Pair with Human2Human"
-    # Nothing to finish until a registration exists.
+    # Nothing to finish or unpair until a registration exists.
     And "Finish setup" "button" should not exist
+    And I should not see "Unpair this site"
     # The hosted service needs no mention and no review.
     And I should not see "other than the hosted service"
     And I should not see "Registration URL"

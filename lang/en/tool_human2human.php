@@ -65,3 +65,7 @@ $string['stepconnect'] = 'Pair';
 $string['stepdone'] = 'done';
 $string['stepfinish'] = 'Finish setup';
 $string['stepready'] = 'Ready for teachers';
+$string['unpair'] = 'Unpair';
+$string['unpairconfirm'] = 'Unpair this site from Human2Human? This removes the external tool from Moodle, and the activities in courses that launch it ({$a}) stop working. To stop launches on the Human2Human side too, deactivate the pairing on your Human2Human account page.';
+$string['unpaired'] = 'This site is no longer paired with Human2Human.';
+$string['unpairlink'] = 'Unpair this site';

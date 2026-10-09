@@ -201,6 +201,26 @@ final class lti_adapter_test extends \advanced_testcase {
         $this->assertEquals($config, lti_get_type_config($typeid));
     }
 
+    public function test_unpair_removes_every_registration_of_our_tool_and_nothing_else(): void {
+        global $DB;
+        $this->resetAfterTest();
+        set_config('registrationurl', self::TOOL_URL, 'tool_human2human');
+
+        $this->assertFalse(lti_adapter::unpair(), 'nothing registered yet');
+
+        $other = $this->create_registered_type('https://notus.example.org/lti/launch');
+        // Pairing twice without unpairing leaves two types; unpairing removes both.
+        $this->create_registered_type('https://h2h.example.net/lti/1.3/launch/');
+        $DB->set_field('lti_types', 'clientid', 'first-pairing', ['tooldomain' => 'h2h.example.net']);
+        $this->create_registered_type('https://h2h.example.net/lti/1.3/launch/');
+
+        $this->assertTrue(lti_adapter::unpair());
+
+        $this->assertNull(lti_adapter::find_type());
+        $this->assertFalse($DB->record_exists('lti_types', ['tooldomain' => 'h2h.example.net']));
+        $this->assertTrue($DB->record_exists('lti_types', ['id' => $other]), 'another vendor tool must survive');
+    }
+
     public function test_team_name_comes_from_the_registration_custom_parameter(): void {
         $this->resetAfterTest();
         set_config('registrationurl', self::TOOL_URL, 'tool_human2human');

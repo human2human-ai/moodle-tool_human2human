@@ -44,6 +44,30 @@ if ($action === 'finishsetup') {
     redirect($pageurl, get_string('setupnothing', 'tool_human2human'), null, notification::NOTIFY_WARNING);
 }
 
+if ($action === 'unpair') {
+    if (optional_param('confirm', false, PARAM_BOOL)) {
+        require_sesskey();
+        lti_adapter::unpair();
+        redirect($pageurl, get_string('unpaired', 'tool_human2human'), null, notification::NOTIFY_SUCCESS);
+    }
+    // Ask first, saying what breaks: the activities that launch the tool.
+    [$activitycount] = lti_adapter::linked_activities(0, 1);
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('pluginname', 'tool_human2human'));
+    echo $OUTPUT->confirm(
+        get_string('unpairconfirm', 'tool_human2human', $activitycount),
+        new single_button(
+            new moodle_url($pageurl, ['action' => 'unpair', 'confirm' => 1, 'sesskey' => sesskey()]),
+            get_string('unpair', 'tool_human2human'),
+            'post',
+            single_button::BUTTON_DANGER
+        ),
+        $pageurl
+    );
+    echo $OUTPUT->footer();
+    die;
+}
+
 $type = lti_adapter::find_type();
 
 // The $plugin->dependencies entry catches mod_lti being uninstalled, not an
@@ -141,6 +165,9 @@ if (!$ltienabled) {
     $action = '';
 }
 
+// Subtle on purpose: unpairing breaks every activity that launches the tool.
+$unpairurl = $stage !== 1 && $ltienabled ? (new moodle_url($pageurl, ['action' => 'unpair']))->out(false) : null;
+
 $context = [
     'logourl' => $OUTPUT->image_url('logo', 'tool_human2human')->out(false),
     'intro' => get_string('intro', 'tool_human2human'),
@@ -150,6 +177,7 @@ $context = [
     'registrationtarget' => $registrationtarget,
     'action' => $action,
     'advanced' => $advanced,
+    'unpairurl' => $unpairurl,
     'links' => [
         [
             'url' => (new moodle_url('/admin/tool/human2human/activities.php'))->out(false),

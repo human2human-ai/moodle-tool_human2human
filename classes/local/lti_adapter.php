@@ -117,20 +117,30 @@ class lti_adapter {
      * @return \stdClass|null
      */
     public static function find_type(): ?\stdClass {
+        $types = self::find_types();
+        return $types ? reset($types) : null;
+    }
+
+    /**
+     * Every site-level LTI 1.3 tool type registered for us, newest first.
+     *
+     * More than one when the site paired again without unpairing first.
+     *
+     * @return \stdClass[]
+     */
+    private static function find_types(): array {
         global $CFG, $DB, $SITE;
         require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
         $domain = self::tool_domain();
         if ($domain === null) {
-            return null;
+            return [];
         }
-        $types = $DB->get_records('lti_types', [
+        return $DB->get_records('lti_types', [
             'tooldomain' => $domain,
             'ltiversion' => LTI_VERSION_1P3,
             'course' => $SITE->id,
         ], 'id DESC');
-
-        return $types ? reset($types) : null;
     }
 
     /**
@@ -269,5 +279,25 @@ class lti_adapter {
         lti_set_state_for_type($type->id, LTI_TOOL_STATE_CONFIGURED);
 
         return true;
+    }
+
+    /**
+     * Unpair: delete every tool type registered for us, so the site can pair again.
+     *
+     * Activities that launch the tool stay in their courses but stop working.
+     * Human2Human keeps its side of the pairing until a team owner deactivates
+     * it there.
+     *
+     * @return bool False when there was nothing to remove.
+     */
+    public static function unpair(): bool {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/lti/locallib.php');
+
+        $types = self::find_types();
+        foreach ($types as $type) {
+            lti_delete_type($type->id);
+        }
+        return (bool) $types;
     }
 }

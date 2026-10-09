@@ -31,6 +31,7 @@
     * action - Rendered button for the next action, if there is one.
     * advanced - Rendered, collapsed form for connecting to another Human2Human;
       only before a connection exists.
+    * unpairurl - The unpair confirmation page, once the site is paired.
     * links - Related admin pages, each with url and label.
 
     Example context (json):
@@ -47,6 +48,7 @@
         "registrationtarget": "This pairs with a Human2Human other than the hosted service, at https://h2h.example.net/lti/1.3/register/.",
         "action": "<button class=\"btn btn-primary\">Pair with Human2Human</button>",
         "advanced": "<form><fieldset class=\"collapsed\"><legend>Advanced</legend></fieldset></form>",
+        "unpairurl": null,
         "links": [{"url": "https://example.com/mod/lti/toolconfigure.php", "label": "Manage external tools"}]
     }
 }}
@@ -81,6 +83,9 @@
                         {{{advanced}}}
                     </div>
                     {{/advanced}}
+                    {{#unpairurl}}
+                    <p class="small mt-4 mb-0"><a class="text-muted" href="{{unpairurl}}">{{#str}} unpairlink, tool_human2human {{/str}}</a></p>
+                    {{/unpairurl}}
                 </div>
             </section>
         </div>
