@@ -147,7 +147,9 @@ under this plugin, which declares that it stores and sends nothing of its own.
 
 ## Pricing
 
-The plugin is free. Activities run on a [Human2Human](https://human2human.ai) subscription:
+This plugin is listed as a paid plugin because it needs the Human2Human service
+to work. Downloading and installing it costs nothing. Activities run on a
+[Human2Human](https://human2human.ai) plan, which comes in three tiers:
 
 - **Free**: $0, no credit card.
   - 500 facilitation minutes
