@@ -6,6 +6,8 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-09
+
 ### Added
 
 - The privacy provider declares what reaches Human2Human when a participant
@@ -15,6 +17,8 @@ All notable changes to this plugin are documented here. The format follows
 
 ### Changed
 
+- The plugin is stable rather than beta.
+- Security problems can also be reported by email to security@human2human.ai.
 - The pairing notice says each participant's name and username are sent, not
   only their name.
 - The README lists everything a launch sends, including the username and ID
