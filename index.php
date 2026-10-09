@@ -43,8 +43,10 @@ if ($action === 'finishsetup') {
     }
     if (optional_param('auto', false, PARAM_BOOL)) {
         // Sent by amd/src/autofinish.js when the administrator comes back before
-        // pairing finished. Nothing went wrong, so say nothing.
-        redirect($pageurl);
+        // pairing finished. Nothing went wrong, so say nothing, but keep showing
+        // what to do next: the script cleared its flag so it does not post again
+        // on every return to this tab.
+        redirect(new moodle_url($pageurl, ['waiting' => 1]));
     }
     redirect($pageurl, get_string('setupnothing', 'tool_human2human'), null, notification::NOTIFY_WARNING);
 }
@@ -52,8 +54,12 @@ if ($action === 'finishsetup') {
 if ($action === 'unpair') {
     if (optional_param('confirm', false, PARAM_BOOL)) {
         require_sesskey();
-        lti_adapter::unpair();
-        redirect($pageurl, get_string('unpaired', 'tool_human2human'), null, notification::NOTIFY_SUCCESS);
+        if (lti_adapter::unpair()) {
+            redirect($pageurl, get_string('unpaired', 'tool_human2human'), null, notification::NOTIFY_SUCCESS);
+        }
+        // Another administrator unpaired first, or the tool was deleted under
+        // Manage external tools after the confirmation page.
+        redirect($pageurl, get_string('unpairnothing', 'tool_human2human'), null, notification::NOTIFY_WARNING);
     }
     // Ask first, saying what breaks: the activities that launch the tool.
     [$activitycount] = lti_adapter::linked_activities(0, 1);
@@ -103,9 +109,11 @@ foreach (['stepconnect', 'stepready'] as $index => $key) {
 }
 
 $registrationtarget = null;
+$pair = null;
 $action = '';
 $advanced = '';
 $waiting = '';
+$waitingshown = false;
 if ($stage === 1 && $ltienabled) {
     // Which Human2Human to connect to, collapsed: only developers, staging sites
     // and private installations change it. Offered only before connecting,
@@ -137,14 +145,19 @@ if ($stage === 1) {
         'url' => lti_adapter::registration_url(),
         'sesskey' => sesskey(),
     ]);
-    // Use formtarget, not target: single_button puts these on the <button>, where
-    // `target` is not an attribute and the submit stays in the current tab.
-    // `formid`, not `id`: single_button always gives the button a random id.
-    $action = $OUTPUT->single_button($connecturl, get_string('connect', 'tool_human2human'), 'get', [
-        'formtarget' => '_blank',
-        'type' => 'primary',
-        'formid' => 'tool_human2human-pair',
-    ]);
+    // Rendered by the template rather than single_button, which cannot set
+    // attributes on the <form>: target and rel="opener" must be in the markup so
+    // a press before the JavaScript loads still keeps the opener for the close
+    // message.
+    $pair = [
+        'url' => $connecturl->out_omit_querystring(),
+        'params' => array_map(
+            fn($name, $value) => ['name' => $name, 'value' => $value],
+            array_keys($connecturl->params()),
+            $connecturl->params()
+        ),
+        'label' => get_string('connect', 'tool_human2human'),
+    ];
     // Shown once Pair is pressed, so the administrator knows what comes next even
     // when the automatic finish below does not fire. Checking is the same
     // finishsetup action, which says so when nothing is registered yet.
@@ -153,6 +166,8 @@ if ($stage === 1) {
         get_string('checkpairing', 'tool_human2human'),
         'post'
     );
+    // From the start after an automatic check found nothing registered yet.
+    $waitingshown = optional_param('waiting', false, PARAM_BOOL);
     // Finishes the setup on its own when the pairing tab is done.
     $PAGE->requires->js_call_amd('tool_human2human/autofinish', 'init', [
         $pageurl->out(false),
@@ -186,6 +201,7 @@ if (!$ltienabled) {
     $steps = [];
     $body = [];
     $registrationtarget = null;
+    $pair = null;
     $action = '';
     $waiting = '';
 }
@@ -200,8 +216,10 @@ $context = [
     'statusnotice' => $statusnotice,
     'body' => $body,
     'registrationtarget' => $registrationtarget,
+    'pair' => $pair,
     'action' => $action,
     'waiting' => $waiting,
+    'waitingshown' => $waitingshown,
     'advanced' => $advanced,
     'unpairurl' => $unpairurl,
     'links' => [

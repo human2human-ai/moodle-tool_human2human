@@ -6,35 +6,27 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
-### Changed
-
-- Pairing finishes the setup on its own when the administrator comes back from
-  Human2Human, so the page has two steps (Pair, Ready for teachers) instead of
-  three. A **Finish pairing** button remains for when that does not happen.
-- The page says "pair" rather than "connect" (**Pair with Human2Human**), since
-  CONNECT is the name of a Human2Human activity type.
-- The Human2Human page shows the connection as three steps (Connect, Finish
-  setup, Ready for teachers) in a branded, width-limited layout rendered from a
-  Mustache template, with related pages beside it.
-- Installing or upgrading the plugin no longer stops on a "New settings" page to
-  review the Registration URL. It is no longer an admin setting: Connect uses
-  the hosted Human2Human unless an address is set under the collapsed
-  "Advanced: connect to a different Human2Human" section of the Human2Human
-  page, offered before connecting. Only an override is stored, and clearing it
-  returns to the hosted service. `admin/cli/cfg.php` still sets it. The address
-  ignores surrounding whitespace and explains what a valid one looks like.
-- The Human2Human page names the registration address only when it is not the
-  hosted service.
-
 ### Added
 
 - **Unpair this site**: a small link on the Human2Human page once the site is
   paired. It says how many course activities stop working, asks for
-  confirmation, and removes the tool so the site can pair again.
-- A Human2Human page under Plugins > Activity modules: which Human2Human team
-  the site is connected to (or, for a tool registered without one, the tool and
-  its address), whether it is ready for teachers, and every course activity
-  that launches Human2Human, with a link back to the connection page.
+  confirmation, and removes the tool so the site can pair again. If the tool
+  was already gone, it says so instead of reporting success.
+- While pairing, the Human2Human page says what to do in the Human2Human tab
+  and offers **Check pairing** in case the page does not update on its own.
+
+### Changed
+
+- The page says "pair" rather than "connect" (**Pair with Human2Human**), since
+  CONNECT is the name of a Human2Human activity type.
+- Pairing finishes the setup on its own when Human2Human closes its tab, or
+  when the administrator comes back to the page, so the page has two steps
+  (Pair, Ready for teachers) instead of three. A **Finish pairing** button
+  remains for when that does not happen.
+- The settings Human2Human is set up with (activity chooser, activity
+  selection, grade sync, participant names but not email addresses) are stated
+  before **Pair with Human2Human**, which accepts them, instead of at the
+  finish step.
 
 ## [0.2.0] - 2026-10-09
 

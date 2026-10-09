@@ -21,7 +21,7 @@
  * its opener, and the administrator coming back to this tab. Either one posts
  * the page's own sesskey-checked finishsetup action, which does nothing until a
  * tool is registered. So any sender may trigger it, and an early return only
- * reloads the page.
+ * reloads the page, once: the flag is cleared before posting.
  *
  * @module     tool_human2human/autofinish
  * @copyright  2026 eduNEXT {@link https://www.edunext.co}
@@ -53,7 +53,19 @@ const isPairing = () => {
     }
 };
 
+const clearStarted = () => {
+    try {
+        window.sessionStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+        // Nothing was stored then.
+    }
+};
+
 const finish = (pageUrl) => {
+    // Post once per Pair press. An early return comes back with the waiting hint
+    // shown by the server, and returning to the tab again must not reload it, nor
+    // must a later unpair in this tab find the flag still set.
+    clearStarted();
     const form = document.createElement('form');
     form.method = 'post';
     form.action = pageUrl;
@@ -89,10 +101,10 @@ export const init = (pageUrl, formId, waitingId) => {
 
     const form = document.getElementById(formId);
     if (form) {
-        // A form submitted to a new tab implies noopener, like a link, which would
-        // leave the tool no window to send its close message to. The tool is the
-        // one this site is pairing with, which Dynamic Registration trusts anyway.
-        form.setAttribute('rel', 'opener');
+        // The form carries rel="opener" in its markup: a form submitted to a new
+        // tab implies noopener, like a link, which would leave the tool no window
+        // to send its close message to. The tool is the one this site is pairing
+        // with, which Dynamic Registration trusts anyway.
         form.addEventListener('submit', () => {
             markStarted();
             showWaiting();
