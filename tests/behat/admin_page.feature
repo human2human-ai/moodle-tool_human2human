@@ -86,9 +86,9 @@ Feature: Human2Human admin page
     Then I should see "Pairing is almost done"
     And I press "Finish pairing"
     And I should see "Human2Human is paired and available in the activity chooser."
-    And I should see "Example University"
     And I should see "Ready for teachers"
     And I navigate to "Plugins > Activity modules > Human2Human" in site administration
+    And I should see "Example University"
     And I should see "Activities in courses that launch Human2Human: 1"
     And I should see "Reflect on teamwork"
     And I should see "Course 1"
