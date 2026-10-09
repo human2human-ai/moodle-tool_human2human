@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'tool_human2human';
-$plugin->version = 2026100801;
+$plugin->version = 2026100900;
 $plugin->requires = 2024100700; // Moodle 4.5 LTS.
 $plugin->supported = [405, 503];
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = '0.2.0';
+$plugin->release = '0.3.0';
 $plugin->dependencies = ['mod_lti' => ANY_VERSION];

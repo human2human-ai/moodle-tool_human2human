@@ -6,6 +6,8 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-09
+
 ### Added
 
 - **Unpair this site**: a small link on the Human2Human page once the site is
