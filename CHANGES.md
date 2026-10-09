@@ -6,6 +6,24 @@ All notable changes to this plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The privacy provider declares what reaches Human2Human when a participant
+  opens an activity: user ID, username, ID number, full name, role, course,
+  activity and language. It replaces the `null_provider`, which said the plugin
+  sends nothing.
+
+### Changed
+
+- The pairing notice says each participant's name and username are sent, not
+  only their name.
+- The README lists everything a launch sends, including the username and ID
+  number, instead of saying the name and email address are sent "only if the
+  tool's privacy settings share them". Pairing sends the name but not the email
+  address, and an administrator can change both under Manage tools.
+- The README says activities open inside the course page, which they have done
+  since 0.3.0.
+
 ## [0.3.0] - 2026-10-09
 
 ### Added
@@ -29,6 +47,9 @@ All notable changes to this plugin are documented here. The format follows
   selection, grade sync, participant names but not email addresses) are stated
   before **Pair with Human2Human**, which accepts them, instead of at the
   finish step.
+- Activities open inside the course page, with the course navigation around
+  them, instead of in a new window. Mobile apps and Safari still open them in a
+  browser tab so the microphone works.
 
 ## [0.2.0] - 2026-10-09
 

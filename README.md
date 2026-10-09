@@ -102,9 +102,9 @@ AI facilitator can converse in additional languages.
    Nothing is copied between the two sites, and no keys or IDs are entered by
    hand. Close that tab when it says the site is paired. Back on the Human2Human
    page, the setup finishes on its own: it activates the tool, adds it to the
-   activity chooser, turns on activity selection and grade sync, launches
-   activities in a new window, and sends each participant's name but not their
-   email address.
+   activity chooser, turns on activity selection and grade sync, opens
+   activities inside the course page, and sends each participant's name and
+   username but not their email address.
 4. Design an activity in [Human2Human](https://human2human.ai), or start from a template.
 5. In your course, turn editing on, add a Human2Human activity and select the
    activity you designed.
@@ -119,21 +119,26 @@ available.
 ### What Moodle shares
 
 Human2Human activities run through Moodle's built-in External tool (LTI 1.3).
-This plugin only sets up that connection. It stores no personal data and sends
-none to Human2Human itself.
+This plugin sets up that connection and chooses what it shares. It stores no
+personal data in Moodle.
 
 When a learner opens an activity, Moodle's External tool sends Human2Human:
 
 - the learner's Moodle user ID and their role in the course;
+- their ID number, if their Moodle profile has one;
 - the course and the activity they opened;
 - their language;
-- their name and email address, only if the tool's privacy settings share
-  them.
+- their full name and their Moodle username, so participants can be named to
+  each other in a conversation.
+
+Their email address is not sent. Pairing sets the tool up this way. An
+administrator can change whether the name and email are shared under
+**Site administration > Plugins > Activity modules > External tool > Manage
+tools**, and pairing does not undo that change.
 
 Scores and feedback come back to the Moodle gradebook through the same
-External tool. Because `mod_lti` is what sends and receives all of it, Moodle's
-privacy registry lists this data under the External tool (`mod_lti`) and not
-under this plugin, which declares that it stores and sends nothing of its own.
+External tool. This plugin declares these fields in Moodle's privacy registry,
+under Human2Human as an external location.
 
 ### How Human2Human handles it
 
