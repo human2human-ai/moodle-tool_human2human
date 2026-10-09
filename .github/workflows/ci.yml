@@ -1,6 +1,11 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+# Tags are tested by release.yml, which calls this workflow.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_call:
 
 permissions:
   contents: read

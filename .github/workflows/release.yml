@@ -1,0 +1,157 @@
+name: Release
+
+# A v<release> tag on main publishes an immutable GitHub release holding the
+# Moodle ZIP, after CI passes on the tagged commit. With the repository variable
+# MARKETPLACE_RELEASE=true, the same ZIP is then submitted to Moodle Marketplace.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  release:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    outputs:
+      zip: ${{ steps.build.outputs.zip }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.ref_name }}
+
+    steps:
+      - name: Check out the tag
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check the tag against version.php and CHANGES.md
+        id: check
+        run: |
+          # Prints one $plugin field from version.php at the given ref.
+          plugin_field() {
+            git show "$1:version.php" | php -r '
+              define("MOODLE_INTERNAL", 1);
+              define("MATURITY_ALPHA", 50); define("MATURITY_BETA", 100);
+              define("MATURITY_RC", 150); define("MATURITY_STABLE", 200);
+              define("ANY_VERSION", "any");
+              $plugin = new stdClass();
+              eval("?>" . stream_get_contents(STDIN));
+              echo $plugin->{$argv[1]} ?? "";' "$2"
+          }
+
+          release=$(plugin_field HEAD release)
+          version=$(plugin_field HEAD version)
+          component=$(plugin_field HEAD component)
+          maturity=$(plugin_field HEAD maturity)
+
+          [[ "$release" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] \
+            || { echo "::error::\$plugin->release '$release' is not semver."; exit 1; }
+          [ "$TAG" = "v$release" ] \
+            || { echo "::error::Tag $TAG does not match \$plugin->release $release."; exit 1; }
+          [ "$component" = "tool_human2human" ] \
+            || { echo "::error::Unexpected component '$component'."; exit 1; }
+          git merge-base --is-ancestor HEAD origin/main \
+            || { echo "::error::$TAG is not on main."; exit 1; }
+
+          prev=$(git describe --tags --abbrev=0 --match 'v*' HEAD^ 2>/dev/null || true)
+          if [ -n "$prev" ]; then
+            prev_version=$(plugin_field "$prev" version)
+            [ "$version" -gt "$prev_version" ] \
+              || { echo "::error::\$plugin->version $version is not above $prev_version ($prev)."; exit 1; }
+          fi
+
+          # The "## [<release>]" section of CHANGES.md, without its heading.
+          awk -v h="## [$release]" '
+            index($0, h) == 1 { on = 1; next }
+            on && /^## / { exit }
+            on' CHANGES.md > "$RUNNER_TEMP/notes.md"
+          grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md" \
+            || { echo "::error::CHANGES.md has no '## [$release]' section."; exit 1; }
+
+          echo "prerelease=$([ "$maturity" -lt 200 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Build the ZIP
+        id: build
+        run: |
+          # Moodle installs admin tools from a folder named after the plugin.
+          zip="tool_human2human-$TAG.zip"
+          git archive --format=zip --prefix=human2human/ -o "$zip" HEAD
+          unzip -l "$zip" | grep -q ' human2human/version.php$' \
+            || { echo "::error::version.php is not at human2human/version.php."; exit 1; }
+          ! unzip -l "$zip" | grep -q ' human2human/\.git' \
+            || { echo "::error::The ZIP holds .git* files; check .gitattributes."; exit 1; }
+          sha256sum "$zip" > "$zip.sha256"
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
+
+      - name: Attest the ZIP's build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ steps.build.outputs.zip }}
+
+      - name: Publish the GitHub release
+        env:
+          ZIP: ${{ steps.build.outputs.zip }}
+          PRERELEASE: ${{ steps.check.outputs.prerelease }}
+        run: |
+          # Assets lock when an immutable release is published, so they are
+          # attached to a draft first. A draft left by a failed run is replaced.
+          draft=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null || true)
+          case "$draft" in
+            true) gh release delete "$TAG" --yes ;;
+            false) echo "::error::$TAG is already released."; exit 1 ;;
+          esac
+          gh release create "$TAG" --draft --verify-tag --title "$TAG" \
+            --notes-file "$RUNNER_TEMP/notes.md" --prerelease="$PRERELEASE"
+          gh release upload "$TAG" "$ZIP" "$ZIP.sha256"
+          gh release edit "$TAG" --draft=false
+
+  marketplace:
+    needs: release
+    if: vars.MARKETPLACE_RELEASE == 'true'
+    runs-on: ubuntu-latest
+    environment: marketplace
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.ref_name }}
+      ZIP: ${{ needs.release.outputs.zip }}
+
+    steps:
+      - name: Download the released ZIP
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$ZIP"
+          gh release verify-asset "$TAG" "$ZIP" --repo "$GITHUB_REPOSITORY"
+
+      # Same request as moodlehq/moodle-plugin-release, but it sends the released
+      # ZIP rather than rebuilding it.
+      - name: Submit the version to Moodle Marketplace
+        env:
+          TOKEN: ${{ secrets.MOODLE_MARKETPLACE_TOKEN }}
+        run: |
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq .body > notes.md
+          status=$(curl -sS -o response.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -F "file=@$ZIP" \
+            -F "releaseNotes=<notes.md" \
+            -F "vcsTag=$TAG" \
+            https://marketplace.moodle.com/api/plugins/tool_human2human/versions)
+          jq . response.json 2>/dev/null || cat response.json
+          [ "$status" = 201 ] || { echo "::error::Marketplace answered HTTP $status."; exit 1; }
