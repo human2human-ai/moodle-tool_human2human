@@ -35,7 +35,7 @@ namespace tool_human2human\local;
  */
 class lti_adapter {
     /** @var string Where Dynamic Registration starts when the admin has not set another. */
-    const DEFAULT_REGISTRATION_URL = 'https://lti.human2human.ai/lti/1.3/register/';
+    const DEFAULT_REGISTRATION_URL = 'https://app.human2human.ai/lti/1.3/register/';
 
     /** @var string The custom parameter Human2Human sends its team name in. */
     const TEAM_CUSTOM_PARAMETER = 'human2human_team';
@@ -243,10 +243,12 @@ class lti_adapter {
             'lti_coursevisible' => LTI_COURSEVISIBLE_ACTIVITYCHOOSER,
             // Deep Linking, so a teacher picks an activity instead of pasting an id.
             'lti_contentitem' => 1,
-            // A new window, not an iframe: these activities use the microphone,
-            // and iframe permission and focus handling make that unreliable for
-            // screen reader and mobile users.
-            'lti_launchcontainer' => LTI_LAUNCH_CONTAINER_WINDOW,
+            // Embedded with the course blocks, so learners keep the Moodle
+            // navigation around the activity. Moodle's embed iframe carries
+            // `allow="microphone <tool origin>"` (mod/lti/view.php), which these
+            // activities need; LaunchView still sends mobile webviews and Safari
+            // out to a real browser tab, where the iframe grant does not reach.
+            'lti_launchcontainer' => LTI_LAUNCH_CONTAINER_EMBED,
             // Human2Human names participants to each other, so the name is sent
             // and the email address is not. Only what the tool asked for in its
             // registration document.

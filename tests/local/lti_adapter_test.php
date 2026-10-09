@@ -183,7 +183,7 @@ final class lti_adapter_test extends \advanced_testcase {
         $config = lti_get_type_config($typeid);
         // Deep Linking lives in the type config: lti_types has no column for it.
         $this->assertEquals(1, $config['contentitem']);
-        $this->assertEquals(LTI_LAUNCH_CONTAINER_WINDOW, $config['launchcontainer']);
+        $this->assertEquals(LTI_LAUNCH_CONTAINER_EMBED, $config['launchcontainer']);
         $this->assertEquals(LTI_SETTING_ALWAYS, $config['sendname']);
         $this->assertEquals(LTI_SETTING_NEVER, $config['sendemailaddr']);
         $this->assertEquals(2, $config['ltiservice_gradesynchronization']);
