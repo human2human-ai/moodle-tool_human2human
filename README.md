@@ -100,15 +100,13 @@ AI facilitator can converse in additional languages.
    Human2Human** and select **Pair with Human2Human**. A new tab opens on
    Human2Human, where you sign in and choose the team the site belongs to.
    Nothing is copied between the two sites, and no keys or IDs are entered by
-   hand. The tab closes itself when it is done.
-4. Finish the setup. Back on the Human2Human page, select **Finish setup**. This
-   activates the registered tool and adds it to the activity chooser, which a
-   dynamically registered tool does not do on its own. It also turns on activity
-   selection and grade sync, launches activities in a new window, and sends each
-   participant's name but not their email address. The page then confirms that
-   Human2Human is paired and ready.
-5. Design an activity in [Human2Human](https://human2human.ai), or start from a template.
-6. In your course, turn editing on, add a Human2Human activity and select the
+   hand. Close that tab when it says the site is paired. Back on the Human2Human
+   page, the setup finishes on its own: it activates the tool, adds it to the
+   activity chooser, turns on activity selection and grade sync, launches
+   activities in a new window, and sends each participant's name but not their
+   email address.
+4. Design an activity in [Human2Human](https://human2human.ai), or start from a template.
+5. In your course, turn editing on, add a Human2Human activity and select the
    activity you designed.
 
 ## External service, data and privacy

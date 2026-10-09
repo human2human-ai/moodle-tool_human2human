@@ -41,6 +41,11 @@ if ($action === 'finishsetup') {
     if (lti_adapter::finish_setup()) {
         redirect($pageurl, get_string('setupdone', 'tool_human2human'), null, notification::NOTIFY_SUCCESS);
     }
+    if (optional_param('auto', false, PARAM_BOOL)) {
+        // Sent by amd/src/autofinish.js when the administrator comes back before
+        // pairing finished. Nothing went wrong, so say nothing.
+        redirect($pageurl);
+    }
     redirect($pageurl, get_string('setupnothing', 'tool_human2human'), null, notification::NOTIFY_WARNING);
 }
 
@@ -83,21 +88,24 @@ if ($type === null) {
     $stage = 3;
 }
 
+// Two steps: finishing the setup is part of pairing, done for the administrator
+// when they come back from Human2Human. Stage 2 is that step not yet finished.
 $steps = [];
-foreach (['stepconnect', 'stepfinish', 'stepready'] as $index => $key) {
+foreach (['stepconnect', 'stepready'] as $index => $key) {
     $number = $index + 1;
     $steps[] = [
         'number' => $number,
         'label' => get_string($key, 'tool_human2human'),
         // The last step is a state, not a task: reaching it completes it.
-        'done' => $number < $stage || $stage === 3,
-        'current' => $number === $stage,
+        'done' => $stage === 3,
+        'current' => $number === ($stage === 3 ? 2 : 1),
     ];
 }
 
 $registrationtarget = null;
 $action = '';
 $advanced = '';
+$waiting = '';
 if ($stage === 1 && $ltienabled) {
     // Which Human2Human to connect to, collapsed: only developers, staging sites
     // and private installations change it. Offered only before connecting,
@@ -115,7 +123,8 @@ if ($stage === 1 && $ltienabled) {
 if ($stage === 1) {
     // Nothing registered yet: offer the one button that starts the exchange.
     $statusnotice = $OUTPUT->notification(get_string('notconnected', 'tool_human2human'), notification::NOTIFY_INFO, false);
-    $body = [get_string('connectintro', 'tool_human2human')];
+    // The privacy terms come before the button, because pressing it accepts them.
+    $body = [get_string('connectintro', 'tool_human2human'), get_string('privacynotice', 'tool_human2human')];
     if (lti_adapter::is_registration_url_overridden()) {
         // Silent for the hosted service; worth a line when it is anything else.
         $registrationtarget = get_string('registrationtarget', 'tool_human2human', lti_adapter::registration_url());
@@ -129,18 +138,33 @@ if ($stage === 1) {
         'sesskey' => sesskey(),
     ]);
     // Use formtarget, not target: single_button puts these on the <button>, where
-    // `target` is not an attribute and the submit stays in the current tab. The
-    // new tab has to keep its opener — that is how the tool's
-    // org.imsglobal.lti.close message gets back here — so no `noopener`.
+    // `target` is not an attribute and the submit stays in the current tab.
+    // `formid`, not `id`: single_button always gives the button a random id.
     $action = $OUTPUT->single_button($connecturl, get_string('connect', 'tool_human2human'), 'get', [
         'formtarget' => '_blank',
         'type' => 'primary',
+        'formid' => 'tool_human2human-pair',
+    ]);
+    // Shown once Pair is pressed, so the administrator knows what comes next even
+    // when the automatic finish below does not fire. Checking is the same
+    // finishsetup action, which says so when nothing is registered yet.
+    $waiting = $OUTPUT->single_button(
+        new moodle_url($pageurl, ['action' => 'finishsetup', 'sesskey' => sesskey()]),
+        get_string('checkpairing', 'tool_human2human'),
+        'post'
+    );
+    // Finishes the setup on its own when the pairing tab is done.
+    $PAGE->requires->js_call_amd('tool_human2human/autofinish', 'init', [
+        $pageurl->out(false),
+        'tool_human2human-pair',
+        'tool_human2human-waiting',
     ]);
 } else if ($stage === 2) {
     // Registered, but Dynamic Registration leaves it pending and out of the
-    // activity chooser, so teachers cannot find it yet.
+    // activity chooser. The automatic finish did not run (the pairing tab was
+    // closed by hand, or the page was opened later), so offer it here.
     $statusnotice = $OUTPUT->notification(get_string('connectedpending', 'tool_human2human'), notification::NOTIFY_WARNING, false);
-    $body = [get_string('finishsetupintro', 'tool_human2human')];
+    $body = [];
     $action = $OUTPUT->single_button(
         new moodle_url($pageurl, ['action' => 'finishsetup', 'sesskey' => sesskey()]),
         get_string('finishsetup', 'tool_human2human'),
@@ -163,6 +187,7 @@ if (!$ltienabled) {
     $body = [];
     $registrationtarget = null;
     $action = '';
+    $waiting = '';
 }
 
 // Subtle on purpose: unpairing breaks every activity that launches the tool.
@@ -176,6 +201,7 @@ $context = [
     'body' => $body,
     'registrationtarget' => $registrationtarget,
     'action' => $action,
+    'waiting' => $waiting,
     'advanced' => $advanced,
     'unpairurl' => $unpairurl,
     'links' => [

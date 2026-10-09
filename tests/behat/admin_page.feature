@@ -16,7 +16,7 @@ Feature: Human2Human admin page
     Then I should see "This site is not paired with Human2Human yet."
     And I should see "Pair with Human2Human"
     # Nothing to finish or unpair until a registration exists.
-    And "Finish setup" "button" should not exist
+    And "Finish pairing" "button" should not exist
     And I should not see "Unpair this site"
     # The hosted service needs no mention and no review.
     And I should not see "other than the hosted service"

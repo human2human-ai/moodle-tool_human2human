@@ -8,6 +8,9 @@ All notable changes to this plugin are documented here. The format follows
 
 ### Changed
 
+- Pairing finishes the setup on its own when the administrator comes back from
+  Human2Human, so the page has two steps (Pair, Ready for teachers) instead of
+  three. A **Finish pairing** button remains for when that does not happen.
 - The page says "pair" rather than "connect" (**Pair with Human2Human**), since
   CONNECT is the name of a Human2Human activity type.
 - The Human2Human page shows the connection as three steps (Connect, Finish
