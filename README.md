@@ -4,6 +4,8 @@ Add AI-facilitated oral exams, role plays, debates and guided reflections to any
 Moodle course. Every learner gets a real conversation and rubric-based feedback
 the moment it ends, with scores in the gradebook and embedded cohort insights.
 
+![A Human2Human Reflect activity embedded in a Moodle course page, ready to start](screenshots/running-activity.png)
+
 ## Description
 
 Moodle makes it easy to deliver content at scale and to assess learners with
@@ -105,9 +107,18 @@ AI facilitator can converse in additional languages.
    activity chooser, turns on activity selection and grade sync, opens
    activities inside the course page, and sends each participant's name and
    username but not their email address.
+
+   ![Human2Human asks the signed-in team owner to confirm the pairing](screenshots/pair-human2human-side.png)
+
+   ![The Human2Human page in Moodle once the site is paired and ready for teachers](screenshots/paired-moodle-side.png)
+
 4. Design an activity in [Human2Human](https://human2human.ai), or start from a template.
 5. In your course, turn editing on, add a Human2Human activity and select the
    activity you designed.
+
+   ![Human2Human in Moodle's activity chooser](screenshots/activity-chooser.png)
+
+   ![The list of Human2Human activities to add to the course](screenshots/select-activity.png)
 
 ## External service, data and privacy
 
